@@ -1,0 +1,167 @@
+
+// client_socket.recv_buf(&mut buf)
+// // loop{
+//     // let mut seq = [115,101,113,0];
+//     client_socket.send(&seq).await;
+//     // client_socket.recv_buf(&mut buf).await;
+//     // println!("{:?}", buf[buf.len()-1]);
+//     client_socket.send(&seq).await;
+//     // client_socket.recv_buf(&mut buf).await;
+//     // println!("{:?}", buf[buf.len()-1]);
+//     client_socket.send(&seq).await;
+//     // client_socket.recv_buf(&mut buf).await;
+//     // println!("{:?}", buf[buf.len()-1]);
+//     client_socket.send(&seq).await;
+//     seq[3]+=1;
+//     client_socket.send(&seq).await;
+
+// client_socket.recv_buf(&mut buf).await;
+// println!("{:?}", buf[buf.len()-1]);
+// if buf[buf.len()-1] == present{
+//     println!("no packet loss")
+// }
+// }
+
+// client_socket.send("seqa".as_bytes()).await;
+// let mut res: Vec<u8> = Vec::with_capacity(300);
+// client_socket.recv_buf(&mut res).await;
+// println!("{:?}",res);
+
+// loop {
+//     let mut res: Vec<u8> = Vec::with_capacity(300);
+//     client_socket.recv_buf(&mut res).await;
+//     // if res.len() == 1 {
+//     //     break;
+//     // }
+//     println!("{}", res.len());
+//     println!("{:?}", res);
+// }
+// let mut s1 = sink.clone();
+// let (mut tx, mut rx) = tokio::sync::mpsc::channel(50);
+// let t1 = tokio::spawn(async move {
+//     let mut seq = 0;
+//     loop {
+//         let mut res: Vec<u8> = Vec::with_capacity(300);
+//         client_socket.clone().recv_buf(&mut res).await;
+//         if res.len() < 11 {
+//             break;
+//         }
+//         println!("receiving chunk...");
+//         //purifying the chunk.....
+//         let mut purified = res[..res.len()-11].to_vec();
+//         if seq == purified[purified.len()-1]{
+
+//         }
+
+//         //
+//         let res: Vec<i16> = res[..res.len() - 11]
+//             .chunks_exact(2)
+//             .map(|chunk| i16::from_be_bytes(chunk.try_into().unwrap()))
+//             .collect();
+//         let res = rodio::buffer::SamplesBuffer::new(2, 48000, res);
+//         // s1.lock().unwrap().append(res);
+//         tx.send(res).await;
+//     }
+//     drop(tx);
+// });
+// let t2 = tokio::spawn(async move{
+//     while let Some(res) = rx.recv().await{
+//         s1.lock().unwrap().append(res);
+//     }
+// });
+// // let t2 = tokio::sp  awn();
+// // t1.await;
+// t2.await;
+// sink.lock().unwrap().sleep_until_end();
+
+
+/*
+older code for reference
+
+
+    // let str = std::str::from_utf8(&buf[..len]).unwrap();
+    // println!("str: {}", str);
+    // let parse_res = str.parse::<usize>();
+    // let mut index: usize = 10000000000000;
+    // match parse_res {
+    //     Ok(res) => {
+    //         index = res;
+    //     }
+    //     Err(e) => {
+    //         println!("problem in parsing: {}", e);
+    //     }
+    // }
+
+    // println!("index: {}", index);
+    // if index >= songs_list.len() || index < 0 {
+    //     socket.send_to("".as_bytes(), addr).await;
+    //     return;
+    // } else {
+    //     match songs_list.get(index) {
+    //         // println!("song is started to be processed!!!!");
+    //         Some(str) => {
+    //             println!("song name: {}", str);
+    //             let new_str = str.to_owned();
+    //             let (mut tx, mut rx) = mpsc::unbounded_channel();
+    //             let t = tokio::spawn(async move {
+    //                 let file =
+    //                     std::io::BufReader::new(std::fs::File::open(new_str.as_str()).unwrap());
+    //                 let mut source = Decoder::new(file).unwrap();
+
+    //                 // source.
+    //                 let buffer: Vec<i16> = source.by_ref().collect();
+    //                 let bytes: Vec<u8> = buffer
+    //                     .iter()
+    //                     .flat_map(|&num| num.to_be_bytes().to_vec()) // little-endian
+    //                     // .flat_map(|&num| num.to_be_bytes().to_vec()) // big-endian
+    //                     .collect();
+    //                 let mut iter = bytes.chunks(256); // 1mb per chunk....
+    //                 let mut seq = 0;
+    //                 while let Some(res) = iter.next() {
+    //                     let mut salt = "music_chunk".as_bytes().to_vec();
+    //                     let mut res = res.to_owned();
+    //                     res.push(seq);
+    //                     res.append(&mut salt);
+    //                     tx.send(res);
+    //                     seq += 1;
+    //                 }
+    //                 drop(tx);
+    //             });
+    //             //handling packet loss here!!!!
+    //             while let Some(res) = rx.recv().await {
+    //                 println!("receiving chunk...");
+    //                 // tokio::time::sleep(Duration::from_millis(10)).await;
+    //                 //send a packet 10 times to increase the chance to be received!!!!
+    //                 // for _ in 0..20 {
+    //                 socket.send_to(&res, addr).await.unwrap();
+    //                 // }
+    //             }
+    //             tokio::time::sleep(Duration::from_millis(10)).await;
+
+    //             println!("done receiving chunk...");
+    //             socket.send_to("done".as_bytes(), addr).await.unwrap();
+    //             println!("done receiving chunk...");
+    //             // t.await;
+    //             // let file = std::io::BufReader::new(std::fs::File::open(str.as_str()).unwrap());
+    //             // let mut source = Decoder::new(file).unwrap();
+
+    //             // // source.
+    //             // let buffer: Vec<i16> = source.by_ref().collect();
+    //             // let bytes: Vec<u8> = buffer
+    //             //     .iter()
+    //             //     .flat_map(|&num| num.to_le_bytes().to_vec()) // little-endian
+    //             //     // .flat_map(|&num| num.to_be_bytes().to_vec()) // big-endian
+    //             //     .collect();
+
+    //             // // println!("Bytes: {:?}", bytes);
+    //             // println!("buffer {}, bytes {}", buffer.len(), bytes.len());
+    //             // socket.send_to(buffer., addr)
+    //         }
+    //         None => {
+    //             socket.send_to("".as_bytes(), addr).await;
+    //             return;
+    //         }
+    //     }
+    // }
+
+*/
