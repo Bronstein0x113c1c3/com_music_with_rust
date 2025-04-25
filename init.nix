@@ -8,6 +8,7 @@ pkgs.mkShell {
     pkgs.portaudio
     pkgs.git
     pkgs.alsa-lib
+    pkgs.rustup
   ];
 
   # Add Go to the PATH when the shell starts

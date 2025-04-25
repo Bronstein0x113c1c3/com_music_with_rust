@@ -5,16 +5,16 @@ use tokio::{self, sync::mpsc::unbounded_channel};
 use rodio::{Decoder, OutputStream, Sink};
 #[tokio::main]
 async fn main() {
-    use tokio::io::{self, AsyncBufReadExt};
+    // use tokio::io::{self, AsyncBufReadExt};
 
-    let stdin = io::stdin();
-    let mut reader = io::BufReader::new(stdin).lines();
+    // let stdin = io::stdin();
+    // let mut reader = io::BufReader::new(stdin).lines();
 
-    println!("Type something and press Enter (Ctrl+D to exit):");
+    // println!("Type something and press Enter (Ctrl+D to exit):");
 
-    while let Ok(Some(line)) = reader.next_line().await {
-        println!("You typed: {}", line);
-    }
+    // while let Ok(Some(line)) = reader.next_line().await {
+    //     println!("You typed: {}", line);
+    // }
 
     /* */
     let (stream, stream_handle) = OutputStream::try_default().unwrap();
@@ -24,7 +24,7 @@ async fn main() {
     let (complete_tx, complete_rx) = tokio::sync::oneshot::channel();
 
     let file = std::io::BufReader::new(
-        std::fs::File::open("./list_songs/01 - There's Nothing Holdin' Me Back.flac").unwrap(),
+        std::fs::File::open("./list_songs/rightforyou_instrumental.mp3").unwrap(),
     );
     let mut source = Decoder::new(file).unwrap();
 
