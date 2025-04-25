@@ -13,8 +13,9 @@ async fn main() {
     //setup connection
     use rustls::crypto::ring::default_provider;
     default_provider().install_default().unwrap();
+    
     let addr = std::net::SocketAddr::new(
-        std::net::IpAddr::V4(std::net::Ipv4Addr::new(127, 0, 0, 1)),
+        std::net::IpAddr::V4(std::net::Ipv4Addr::new(192, 168, 0, 102)),
         8080,
     );
     let (mut connection, mut endpoint) = setup_unsafe(addr).await.unwrap();
@@ -30,7 +31,7 @@ async fn main() {
     let (sender, mut receiver) = unbounded_channel();
     let t1 = tokio::spawn(async move {
         loop {
-            let mut buf = [0u8; 44100];
+            let mut buf = [0u8; 1000];
             let res = recv_stream.read_exact(&mut buf).await;
             match res {
                 Ok(x) => {
@@ -39,7 +40,7 @@ async fn main() {
                         .chunks_exact(2)
                         .map(|chunk| i16::from_be_bytes(chunk.try_into().unwrap()))
                         .collect();
-                    let res = rodio::buffer::SamplesBuffer::new(2, 44100, res);
+                    let res = rodio::buffer::SamplesBuffer::new(2, 40000, res);
                     // s1.lock().unwrap().append(res);
                     sender.send(res);
                     // let wait_buffer = [0u8; 1];
@@ -50,7 +51,14 @@ async fn main() {
                 }
 
                 Err(e) => {
-                    println!("got error in reading exact!!!!");
+                    println!("last piece of the song!!!!");
+                    let res: Vec<i16> = buf
+                        .chunks_exact(2)
+                        .map(|chunk| i16::from_be_bytes(chunk.try_into().unwrap()))
+                        .collect();
+                    let res = rodio::buffer::SamplesBuffer::new(2, 40000, res);
+                    // s1.lock().unwrap().append(res);
+                    sender.send(res);
                     break;
                 }
             }

@@ -36,12 +36,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
     let mut bi = conn.open_bi().await.unwrap();
     // uni.
     // implement the ack!!!!
-    let mut iter = bytes.chunks(44100);
+    let mut iter = bytes.chunks(4410);
     while let Some(chunk) = iter.next(){
 
         bi.0.write_all(chunk).await;
         
-        sleep(Duration::from_millis(200)).await;
+        sleep(Duration::from_millis(10)).await;
         bi.0.flush().await;
         println!("sended!!!");
         // sleep(Duration::from_millis(10)).await;

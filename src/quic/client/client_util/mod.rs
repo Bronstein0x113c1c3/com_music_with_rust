@@ -2,9 +2,7 @@ use quinn::{ClientConfig, Connection, Endpoint, crypto::rustls::QuicClientConfig
 use rustls::pki_types::CertificateDer;
 // use rcgen::
 use std::{
-    error::Error,
-    net::{IpAddr, Ipv4Addr, SocketAddr},
-    sync::Arc,
+    error::Error, net::{IpAddr, Ipv4Addr, SocketAddr}, str::FromStr, sync::Arc
 };
 pub mod cert;
 use cert::SkipServerVerification;
@@ -33,7 +31,8 @@ fn configure_client(
 pub async fn setup_unsafe(
     server_addr: SocketAddr,
 ) -> Result<(Connection, Endpoint), Box<dyn Error + Send + Sync + 'static>> {
-    let mut endpoint = Endpoint::client(SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 0))?;
+    let addr = SocketAddr::new(std::net::IpAddr::V4(Ipv4Addr::from_str("0.0.0.0").unwrap()), 0);
+    let mut endpoint = Endpoint::client(addr)?;
 
     endpoint.set_default_client_config(ClientConfig::new(Arc::new(QuicClientConfig::try_from(
         rustls::ClientConfig::builder()
